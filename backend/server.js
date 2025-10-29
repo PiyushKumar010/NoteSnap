@@ -10,11 +10,12 @@ const filesRoutes = require("./Routes/file.js");
 const savenotes = require("./Routes/note.js");
 
 
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin:process.env.FRONTEND_URL,
+    origin:true,
     credentials:true,
 }))
 
@@ -33,11 +34,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: store,
-  cookie: {
-    httpOnly: true,     // helps protect from XSS
-    secure: false,      // ❌ don’t use true on localhost
-    sameSite: 'lax',    // ✅ allow cookie in cross-origin (frontend/backend different ports)
-  },
+  
 }));
 
 
