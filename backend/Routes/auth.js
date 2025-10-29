@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
@@ -6,16 +6,16 @@ require("dotenv").config();
 const router = express.Router();
 const User = require("../Models/userModel.js");
 
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER || "harshitbali320@gmail.com",
-        pass: process.env.EMAIL_PASS || "sfusgxipfcryghoj"
-    },
-    logger: false,
-    debug: false
-});
+// const transporter = nodemailer.createTransport({
+//     service: 'Gmail',
+//     secure: false,
+//     auth: {
+//         user: process.env.EMAIL_USER || "harshitbali320@gmail.com",
+//         pass: process.env.EMAIL_PASS || "sfusgxipfcryghoj"
+//     },
+//     logger: false,
+//     debug: false
+// });
 
 
 //Logout route
@@ -48,27 +48,27 @@ router.post("/signup", async (req, res) => {
         if (existingUser) return res.status(400).json({ message: "Email already registered" });
 
         //generate otp
-        const otp = crypto.randomInt(100000, 999999).toString();
+        // const otp = crypto.randomInt(100000, 999999).toString();
 
 
-        //sending email
-        try {
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: email,
-                subject: "Your Verification OTP",
-                html: `
-                <h3>Email Verification</h3>
-                <p>Hi ${name},</p>
-                <p>Your OTP for email verification is:</p>
-                <h2>${otp}</h2>
-                <p>This OTP will expire in 10 minutes</p>
-            `
-            });
-        }
-        catch (mailErr) {
-            console.error("Mail send error:", mailErr);
-        }
+        // //sending email
+        // try {
+        //     await transporter.sendMail({
+        //         from: process.env.EMAIL_USER,
+        //         to: email,
+        //         subject: "Your Verification OTP",
+        //         html: `
+        //         <h3>Email Verification</h3>
+        //         <p>Hi ${name},</p>
+        //         <p>Your OTP for email verification is:</p>
+        //         <h2>${otp}</h2>
+        //         <p>This OTP will expire in 10 minutes</p>
+        //     `
+        //     });
+        // }
+        // catch (mailErr) {
+        //     console.error("Mail send error:", mailErr);
+        // }
 
 
         // hash password
@@ -78,9 +78,9 @@ router.post("/signup", async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            otp,
-            otpExpiresAt: Date.now() + 60 * 60 * 1000,
-            isVerified: false
+            // otp,
+            // otpExpiresAt: Date.now() + 60 * 60 * 1000,
+            // isVerified: false
         });
         await newUser.save();
 
@@ -96,38 +96,38 @@ router.post("/signup", async (req, res) => {
 
 //verification Route
 
-router.post("/verify", async (req, res) => {
-    try {
-        const { email, otp } = req.body;
+// router.post("/verify", async (req, res) => {
+//     try {
+//         const { email, otp } = req.body;
 
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: "User not found" });
-        if (user.isVerified) return res.status(400).json({ message: "Already verified" });
+//         const user = await User.findOne({ email });
+//         if (!user) return res.status(404).json({ message: "User not found" });
+//         if (user.isVerified) return res.status(400).json({ message: "Already verified" });
 
 
-        // Check otp and expiry
-        if (
-            user.otp &&
-            String(user.otp) === String(otp) &&
-            user.otpExpiresAt &&
-            user.otpExpiresAt > Date.now()
-        ) {
-            user.isVerified = true;
-            user.otp = undefined;
-            user.otpExpiresAt = undefined;
-            await user.save();
+//         // Check otp and expiry
+//         if (
+//             user.otp &&
+//             String(user.otp) === String(otp) &&
+//             user.otpExpiresAt &&
+//             user.otpExpiresAt > Date.now()
+//         ) {
+//             user.isVerified = true;
+//             user.otp = undefined;
+//             user.otpExpiresAt = undefined;
+//             await user.save();
 
-            return res.status(200).json({
-                message: "Verified successfully! You are now logged in.",
-            });
-        }
+//             return res.status(200).json({
+//                 message: "Verified successfully! You are now logged in.",
+//             });
+//         }
 
-        return res.status(400).json({ message: "Invalid or expired OTP" });
-    } catch (err) {
-        console.error("Verify error:", err);
-        res.status(500).json({ message: "Verification failed" });
-    }
-});
+//         return res.status(400).json({ message: "Invalid or expired OTP" });
+//     } catch (err) {
+//         console.error("Verify error:", err);
+//         res.status(500).json({ message: "Verification failed" });
+//     }
+// });
 
 
 
@@ -137,7 +137,7 @@ router.post("/login", async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: "User not found" });
-        if (!user.isVerified) return res.status(403).json({ message: "Email not verified" });
+        // if (!user.isVerified) return res.status(403).json({ message: "Email not verified" });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid Password" });

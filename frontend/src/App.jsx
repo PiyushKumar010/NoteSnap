@@ -4,7 +4,7 @@ import { useAuth } from "./context/AuthContext";
 import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
-import Verification from "./Pages/verification";
+// import Verification from "./Pages/verification";
 import Dashboard from "./Pages/Dashboard";
 import UploadPage from "./Pages/UploadPage";
 import NotesPage from "./Pages/NotesPage";
@@ -59,7 +59,7 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home isDark={isDark} setIsDark={setIsDark} />} />
-        <Route path="/verification" element={<Verification />} />
+        {/* <Route path="/verification" element={<Verification />} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
