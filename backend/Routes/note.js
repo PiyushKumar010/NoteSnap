@@ -1,42 +1,43 @@
 const express = require("express");
-const router = express.Router();
 const mongoose = require("mongoose");
 const Note = require("../Models/notes");
+const router = express.Router();
 
+// 🔹 Save Note
 router.post("/", async (req, res) => {
-    try {
-        const { title, fileUrl, createdAt } = req.body;
-        if (!req.session || !req.session.user || !req.session.user.id) {
-            return res.status(401).json({ message: "Not authenticated" });
-        }
-        const userId = req.session.user.id;
+  try {
+    const { title, fileUrl, createdAt } = req.body;
+    if (!req.session?.user?.id)
+      return res.status(401).json({ message: "Not authenticated" });
 
-        // Convert userId to ObjectId
-        const note = await Note.create({
-            title,
-            fileUrl,
-            user: mongoose.Types.ObjectId(userId),
-            createdAt: createdAt || new Date()
-        });
-        res.status(201).json(note);
-    } catch (err) {
-        console.error("Failed to save note:", err);
-        res.status(500).json({ error: "Failed to save note." });
-    }
+    const note = await Note.create({
+      title,
+      fileUrl,
+      user: mongoose.Types.ObjectId(req.session.user.id),
+      createdAt: createdAt || new Date(),
+    });
+
+    res.status(201).json(note);
+  } catch (err) {
+    console.error("Failed to save note:", err);
+    res.status(500).json({ error: "Failed to save note." });
+  }
 });
 
+// 🔹 Get All Notes
 router.get("/", async (req, res) => {
-    if (!req.session || !req.session.user || !req.session.user.id) {
-        return res.status(401).json({ message: "Not Authenticated" });
-    }
-    try {
-        const userId = req.session.user.id;
-        const notes = await Note.find({ user: userId }).sort({ createdAt: -1 });
-        res.json(notes);
-    } catch (error) {
-        console.error("Error fetching notes:", error);
-        res.status(500).json({ message: "Failed to fetch notes" });
-    }
+  if (!req.session?.user?.id)
+    return res.status(401).json({ message: "Not authenticated" });
+
+  try {
+    const notes = await Note.find({ user: req.session.user.id }).sort({
+      createdAt: -1,
+    });
+    res.json(notes);
+  } catch (err) {
+    console.error("Error fetching notes:", err);
+    res.status(500).json({ message: "Failed to fetch notes" });
+  }
 });
 
 module.exports = router;
